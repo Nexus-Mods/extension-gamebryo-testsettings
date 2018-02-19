@@ -1,6 +1,6 @@
 {
   "name": "gamebryo-test-settings",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "Management for gamebryo tests settings",
   "main": "./out/index.js",
   "repository": "",

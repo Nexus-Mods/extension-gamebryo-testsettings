@@ -85,6 +85,10 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
     return Promise.resolve(undefined);
   }
 
+  if ((gameDiscovery === undefined) || (gameDiscovery.path === undefined)) {
+    return Promise.resolve(undefined);
+  }
+
   const game = util.getGame(gameId);
 
   const prom = defaultFonts[gameId] !== undefined
