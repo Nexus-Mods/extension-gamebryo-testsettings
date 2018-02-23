@@ -19,7 +19,7 @@ function missingOblivionFont(store: Redux.Store<types.IState>,
   const missingFonts: string[] = [];
 
   const fonts: string[] = [];
-  Object.keys(iniFile.data.Fonts)
+  Object.keys(iniFile.data.Fonts || {})
       .forEach((key: string) => {
         if (oblivionDefaultFonts[key] !== iniFile.data.Fonts[key]) {
           fonts.push(iniFile.data.Fonts[key]);
