@@ -4,7 +4,7 @@ import missingSkyrimFonts from './util/missingSkyrimFonts';
 
 import * as Promise from 'bluebird';
 import * as path from 'path';
-import { selectors, types, util } from 'vortex-api';
+import { fs, selectors, types, util } from 'vortex-api';
 import IniParser, { IniFile, WinapiFormat } from 'vortex-parse-ini';
 
 const parser = new IniParser(new WinapiFormat());
@@ -91,10 +91,12 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
 
   const game = util.getGame(gameId);
 
+  const interfacePath = path.join(game.getModPaths(gameDiscovery.path)[''],
+                                  'Skyrim - Interface.bsa');
+
   const prom = defaultFonts[gameId] !== undefined
     ? Promise.resolve(undefined)
-    : context.api.openArchive(path.join(game.getModPaths(gameDiscovery.path)[''],
-                              'Skyrim - Interface.bsa'))
+    : context.api.openArchive(interfacePath)
     .then((archive: util.Archive) => archive.readDir('interface'))
     .then((files: string[]) => {
       defaultFonts[gameId] = new Set<string>(files
@@ -102,8 +104,17 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
         .map(name => path.join('interface', name)));
     })
     .catch((err: Error) => {
-      context.api.showErrorNotification('failed to read default fonts', err);
-      return Promise.reject(new Error('default fonts unknown'));
+      return fs.statAsync(interfacePath)
+        .then(() => {
+          context.api.showErrorNotification('failed to read default fonts', err);
+          return Promise.reject(new Error('default fonts unknown'));
+        })
+        .catch(statErr => {
+          context.api.showErrorNotification('"Skyrim - Interface.bsa" appears to be missing', err, {
+            allowReport: false,
+          });
+          return Promise.reject(new Error('default fonts unknown'));
+        });
     });
 
   return prom
