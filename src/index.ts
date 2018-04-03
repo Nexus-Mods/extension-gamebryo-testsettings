@@ -81,7 +81,7 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
   const gameDiscovery: types.IDiscoveryResult = util.getSafe(store.getState(),
     ['settings', 'gameMode', 'discovered', gameId], undefined);
 
-  if ((gameId !== 'skyrim') && (gameId !== 'skyrimse')) {
+  if ((gameId !== 'skyrim') && (gameId !== 'skyrimse') && (gameId !== 'skyrimvr')) {
     return Promise.resolve(undefined);
   }
 
