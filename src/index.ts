@@ -106,7 +106,10 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
     .catch((err: Error) => {
       return fs.statAsync(interfacePath)
         .then(() => {
-          context.api.showErrorNotification('failed to read default fonts', err);
+          context.api.showErrorNotification('Failed to read default fonts', {
+            filePath: interfacePath,
+            error: err,
+          });
           return Promise.reject(new Error('default fonts unknown'));
         })
         .catch(statErr => {
