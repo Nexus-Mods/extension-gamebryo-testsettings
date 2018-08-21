@@ -4,12 +4,13 @@ import missingSkyrimFonts from './util/missingSkyrimFonts';
 
 import * as Promise from 'bluebird';
 import * as path from 'path';
+import * as Redux from 'redux';
 import { fs, selectors, types, util } from 'vortex-api';
 import IniParser, { IniFile, WinapiFormat } from 'vortex-parse-ini';
 
 const parser = new IniParser(new WinapiFormat());
 
-function fixOblivionFonts(iniFile: IniFile, missingFonts: string[], gameId: string): Promise<void> {
+function fixOblivionFonts(iniFile: IniFile<any>, missingFonts: string[], gameId: string): Promise<void> {
   return new Promise<void>((fixResolve, fixReject) => {
     Object.keys(iniFile.data.Fonts)
         .forEach((key) => {
@@ -36,10 +37,10 @@ function testOblivionFontsImpl(store: Redux.Store<types.IState>) {
     return Promise.resolve(undefined);
   }
 
-  let iniFile: IniFile;
+  let iniFile: IniFile<any>;
 
   return parser.read(iniPath(gameId))
-  .then((iniFileIn: IniFile) => {
+  .then((iniFileIn: IniFile<any>) => {
     iniFile = iniFileIn;
     return missingOblivionFont(store, iniFile, gameId);
   })

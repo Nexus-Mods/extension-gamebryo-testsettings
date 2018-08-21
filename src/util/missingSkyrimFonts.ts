@@ -11,7 +11,7 @@ function missingSkyrimFonts(state: types.IState, skyrimDefaultFonts: Set<string>
   const fontconfigTxt = path.join(modPath, 'interface', 'fontconfig.txt');
 
   return fs.readFileAsync(fontconfigTxt)
-    .then((fontconfig: NodeBuffer) => {
+    .then((fontconfig: Buffer) => {
       // extract fonts from fontlib lines
       const rows = fontconfig.toString().split('\n');
       const fonts: string[] =

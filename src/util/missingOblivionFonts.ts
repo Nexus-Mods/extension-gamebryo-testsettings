@@ -2,6 +2,7 @@ import { iniPath } from './gameSupport';
 
 import * as Promise from 'bluebird';
 import * as path from 'path';
+import * as Redux from 'redux';
 import { fs, types } from 'vortex-api';
 import { IniFile } from 'vortex-parse-ini';
 
@@ -14,7 +15,7 @@ export const oblivionDefaultFonts = {
 };
 
 function missingOblivionFont(store: Redux.Store<types.IState>,
-                             iniFile: IniFile,
+                             iniFile: IniFile<any>,
                              gameId: string): Promise<string[]> {
   const missingFonts: string[] = [];
 
