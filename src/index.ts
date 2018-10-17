@@ -12,11 +12,12 @@ const parser = new IniParser(new WinapiFormat());
 
 function fixOblivionFonts(iniFile: IniFile<any>, missingFonts: string[], gameId: string): Promise<void> {
   return new Promise<void>((fixResolve, fixReject) => {
-    Object.keys(iniFile.data.Fonts)
+    try {
+      Object.keys(iniFile.data.Fonts)
         .forEach((key) => {
           if (missingFonts.find((item) => {
-                return item === iniFile.data.Fonts[key];
-              }) !== undefined) {
+            return item === iniFile.data.Fonts[key];
+          }) !== undefined) {
             if (oblivionDefaultFonts[key] !== undefined) {
               iniFile.data.Fonts[key] = oblivionDefaultFonts[key];
             } else {
@@ -25,12 +26,16 @@ function fixOblivionFonts(iniFile: IniFile<any>, missingFonts: string[], gameId:
           }
         });
 
-    parser.write(iniPath(gameId), iniFile);
-    fixResolve();
+      parser.write(iniPath(gameId), iniFile);
+      fixResolve();
+    } catch (err) {
+      fixReject(err);
+    }
   });
 }
 
-function testOblivionFontsImpl(store: Redux.Store<types.IState>) {
+function testOblivionFontsImpl(api: types.IExtensionApi) {
+  const store: Redux.Store<types.IState> = api.store;
   const gameId = selectors.activeGameId(store.getState());
 
   if (gameId !== 'oblivion') {
@@ -154,7 +159,7 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
 
 function init(context: types.IExtensionContext): boolean {
   const testOblivionFonts = (): Promise<types.ITestResult> =>
-    testOblivionFontsImpl(context.api.store);
+    testOblivionFontsImpl(context.api);
 
   const testSkyrimFonts = (): Promise<types.ITestResult> => testSkyrimFontsImpl(context);
 
