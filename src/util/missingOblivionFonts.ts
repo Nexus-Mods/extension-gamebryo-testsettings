@@ -1,9 +1,7 @@
-import { iniPath } from './gameSupport';
-
 import * as Promise from 'bluebird';
 import * as path from 'path';
 import * as Redux from 'redux';
-import { fs, types } from 'vortex-api';
+import { fs, selectors, types } from 'vortex-api';
 import { IniFile } from 'vortex-parse-ini';
 
 export const oblivionDefaultFonts = {
@@ -17,6 +15,12 @@ export const oblivionDefaultFonts = {
 function missingOblivionFont(store: Redux.Store<types.IState>,
                              iniFile: IniFile<any>,
                              gameId: string): Promise<string[]> {
+  const discovery: types.IDiscoveryResult = selectors.discoveryByGame(store.getState(), gameId);
+  if ((discovery === undefined) || (discovery.path === undefined)) {
+    // not this extensions job to report game not being discovered
+    return Promise.resolve([]);
+  }
+
   const missingFonts: string[] = [];
 
   const fonts: string[] = [];
@@ -27,12 +31,10 @@ function missingOblivionFont(store: Redux.Store<types.IState>,
         }
       });
 
-  const gameIniPath = path.dirname(iniPath(gameId));
-
   return Promise.each(fonts, (font: string) =>
-                                 fs.statAsync(path.join(gameIniPath, font))
-                                     .catch(() => { missingFonts.push(font); }))
-      .then(() => Promise.resolve(missingFonts));
+    fs.statAsync(path.join(discovery.path, font))
+      .catch(() => { missingFonts.push(font); }))
+  .then(() => Promise.resolve(missingFonts));
 }
 
 export default missingOblivionFont;
