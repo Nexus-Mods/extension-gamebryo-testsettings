@@ -26,8 +26,9 @@ function fixOblivionFonts(iniFile: IniFile<any>, missingFonts: string[], gameId:
           }
         });
 
-      parser.write(iniPath(gameId), iniFile);
-      fixResolve();
+      parser.write(iniPath(gameId), iniFile)
+        .then(() => fixResolve())
+        .catch(err => fixReject(err));
     } catch (err) {
       fixReject(err);
     }
