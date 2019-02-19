@@ -8,6 +8,10 @@ const gameSupport = {
     mygamesPath: 'skyrim',
     iniName: 'Skyrim.ini',
   },
+  enderal: {
+    mygamesPath: 'enderal',
+    iniName: 'Enderal.ini',
+  },
   skyrimse: {
     mygamesPath: 'Skyrim Special Edition',
     iniName: 'Skyrim.ini',
