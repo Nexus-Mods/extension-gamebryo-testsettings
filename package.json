@@ -32,9 +32,9 @@
     "react-i18next": "^1.10.1",
     "redux-act": "^1.7.3",
     "rm-local-modules": "^0.0.2",
-    "ts-loader": "2.3.4",
+    "ts-loader": "^5.3.3",
     "vortex-api": "Nexus-Mods/vortex-api",
     "vortex-parse-ini": "Nexus-Mods/vortex-parse-ini",
-    "webpack": "^3.7.1"
+    "webpack": "^4.29.6"
   }
 }
