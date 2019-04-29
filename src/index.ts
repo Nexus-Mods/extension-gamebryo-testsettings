@@ -5,7 +5,7 @@ import missingSkyrimFonts from './util/missingSkyrimFonts';
 import * as Promise from 'bluebird';
 import * as path from 'path';
 import * as Redux from 'redux';
-import { fs, selectors, types, util } from 'vortex-api';
+import { fs, log, selectors, types, util } from 'vortex-api';
 import IniParser, { IniFile, WinapiFormat } from 'vortex-parse-ini';
 
 const parser = new IniParser(new WinapiFormat());
@@ -112,6 +112,10 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
         .map(name => path.join('interface', name)));
     })
     .catch((err: Error) => {
+      if (err instanceof util.NotSupportedError) {
+        log('info', 'Not checking font list because bsa archive support not available');
+        return Promise.reject(err);
+      }
       return fs.statAsync(interfacePath)
         .then(() => {
           context.api.showErrorNotification('Failed to read default fonts', {
@@ -148,6 +152,7 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
         severity: 'error' as types.ProblemSeverity,
       });
     })
+    .catch(util.NotSupportedError, () => Promise.resolve(undefined))
     .catch((err: Error) => {
       return Promise.resolve({
         description: {
