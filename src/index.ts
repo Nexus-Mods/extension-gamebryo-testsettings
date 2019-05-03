@@ -88,8 +88,7 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
   const gameDiscovery: types.IDiscoveryResult = util.getSafe(store.getState(),
     ['settings', 'gameMode', 'discovered', gameId], undefined);
 
-  if ((gameId !== 'skyrim') && (gameId !== 'enderal')
-      && (gameId !== 'skyrimse') && (gameId !== 'skyrimvr')) {
+  if (['skyrim', 'enderal', 'skyrimse', 'skyrimvr'].indexOf(gameId) === -1) {
     return Promise.resolve(undefined);
   }
 
@@ -118,9 +117,8 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
       }
       return fs.statAsync(interfacePath)
         .then(() => {
-          context.api.showErrorNotification('Failed to read default fonts', {
-            filePath: interfacePath,
-            error: err,
+          context.api.showErrorNotification('Failed to read default fonts', err, {
+            message: interfacePath,
           });
           return Promise.reject(new Error('default fonts unknown'));
         })
