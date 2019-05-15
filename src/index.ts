@@ -122,7 +122,7 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
           });
           return Promise.reject(new Error('default fonts unknown'));
         })
-        .catch(statErr => {
+        .catch(() => {
           context.api.showErrorNotification('"Skyrim - Interface.bsa" appears to be missing', err, {
             allowReport: false,
           });
