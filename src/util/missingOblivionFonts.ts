@@ -5,12 +5,14 @@ import { fs, selectors, types } from 'vortex-api';
 import { IniFile } from 'vortex-parse-ini';
 
 export const oblivionDefaultFonts = {
-  SFontFile_1: 'Data\\Fonts\\Kingthings_Regular.fnt',
-  SFontFile_2: 'Data\\Fonts\\Kingthings_Shadowed.fnt',
-  SFontFile_3: 'Data\\Fonts\\Tahoma_Bold_Small.fnt',
-  SFontFile_4: 'Data\\Fonts\\Daedric_Font.fnt',
-  SFontFile_5: 'Data\\Fonts\\Handwritten.fnt',
+  sfontfile_1: 'Data\\Fonts\\Kingthings_Regular.fnt',
+  sfontfile_2: 'Data\\Fonts\\Kingthings_Shadowed.fnt',
+  sfontfile_3: 'Data\\Fonts\\Tahoma_Bold_Small.fnt',
+  sfontfile_4: 'Data\\Fonts\\Daedric_Font.fnt',
+  sfontfile_5: 'Data\\Fonts\\Handwritten.fnt',
 };
+
+const defaultFontSet = new Set(Object.values(oblivionDefaultFonts).map(font => font.toLowerCase()));
 
 function missingOblivionFont(store: Redux.Store<types.IState>,
                              iniFile: IniFile<any>,
@@ -26,7 +28,7 @@ function missingOblivionFont(store: Redux.Store<types.IState>,
   const fonts: string[] = [];
   Object.keys(iniFile.data.Fonts || {})
       .forEach((key: string) => {
-        if (oblivionDefaultFonts[key] !== iniFile.data.Fonts[key]) {
+        if (!defaultFontSet.has(iniFile.data.Fonts[key].toLowerCase())) {
           fonts.push(iniFile.data.Fonts[key]);
         }
       });

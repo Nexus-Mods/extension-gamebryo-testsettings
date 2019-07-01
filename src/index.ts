@@ -18,8 +18,9 @@ function fixOblivionFonts(iniFile: IniFile<any>, missingFonts: string[], gameId:
           if (missingFonts.find((item) => {
             return item === iniFile.data.Fonts[key];
           }) !== undefined) {
-            if (oblivionDefaultFonts[key] !== undefined) {
-              iniFile.data.Fonts[key] = oblivionDefaultFonts[key];
+            const keyL = key.toLowerCase();
+            if (oblivionDefaultFonts[keyL] !== undefined) {
+              iniFile.data.Fonts[key] = oblivionDefaultFonts[keyL];
             } else {
               delete iniFile.data.Fonts[key];
             }
