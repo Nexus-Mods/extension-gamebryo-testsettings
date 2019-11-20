@@ -2,7 +2,7 @@ import { iniPath } from './util/gameSupport';
 import missingOblivionFont, { oblivionDefaultFonts } from './util/missingOblivionFonts';
 import missingSkyrimFonts from './util/missingSkyrimFonts';
 
-import * as Promise from 'bluebird';
+import Promise from 'bluebird';
 import * as path from 'path';
 import * as Redux from 'redux';
 import { fs, log, selectors, types, util } from 'vortex-api';
@@ -169,8 +169,8 @@ function init(context: types.IExtensionContext): boolean {
 
   const testSkyrimFonts = (): Promise<types.ITestResult> => testSkyrimFontsImpl(context);
 
-  context.registerTest('oblivion-fonts', 'gamemode-activated', testOblivionFonts);
-  context.registerTest('skyrim-fonts', 'gamemode-activated', testSkyrimFonts);
+  context.registerTest('oblivion-fonts', 'gamemode-activated', testOblivionFonts as any);
+  context.registerTest('skyrim-fonts', 'gamemode-activated', testSkyrimFonts as any);
 
   return true;
 }

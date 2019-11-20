@@ -1,4 +1,4 @@
-import * as Promise from 'bluebird';
+import Promise from 'bluebird';
 import * as path from 'path';
 import * as Redux from 'redux';
 import { fs, selectors, types } from 'vortex-api';
