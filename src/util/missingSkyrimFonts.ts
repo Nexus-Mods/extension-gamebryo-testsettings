@@ -34,7 +34,7 @@ function missingSkyrimFonts(state: types.IState, skyrimDefaultFonts: Set<string>
     .then((missingFonts: string[]) =>
       Promise.resolve(missingFonts.filter(font => font !== null)))
     // assume any error reading/parsing the file is an error on our end not in the file
-    .catch(() => Promise.resolve([]));
+    .catch(() => Promise.resolve<string[]>([]));
 }
 
 export default missingSkyrimFonts;

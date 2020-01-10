@@ -21,7 +21,7 @@
     "babel-core": "^6.14.0",
     "babel-loader": "^6.2.5",
     "babel-polyfill": "^6.13.0",
-    "bluebird": "^3.4.6",
+    "bluebird": "^3.7.2",
     "copyfiles": "^2.1.1",
     "i18next": "^3.5.1",
     "immutability-helper": "^2.2.2",
@@ -33,7 +33,7 @@
     "redux-act": "^1.7.3",
     "rm-local-modules": "^0.0.2",
     "ts-loader": "^5.3.3",
-    "vortex-api": "Nexus-Mods/vortex-api",
+    "vortex-api": "Nexus-Mods/Vortex-api#electron7",
     "vortex-parse-ini": "Nexus-Mods/vortex-parse-ini",
     "webpack": "^4.29.6"
   }
