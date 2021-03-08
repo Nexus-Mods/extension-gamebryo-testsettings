@@ -1,4 +1,4 @@
-import { iniPath } from './util/gameSupport';
+import { iniPath, initGameSupport } from './util/gameSupport';
 import missingOblivionFont, { oblivionDefaultFonts } from './util/missingOblivionFonts';
 import missingSkyrimFonts from './util/missingSkyrimFonts';
 
@@ -173,6 +173,13 @@ function init(context: types.IExtensionContext): boolean {
 
   context.registerTest('oblivion-fonts', 'gamemode-activated', testOblivionFonts as any);
   context.registerTest('skyrim-fonts', 'gamemode-activated', testSkyrimFonts as any);
+
+  context.once(() => {
+    context.api.onStateChange(
+      ['settings', 'gameMode', 'discovered'], (previous, current) => {
+        initGameSupport(context.api.store);
+      });
+  });
 
   return true;
 }
