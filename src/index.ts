@@ -122,14 +122,14 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
             message: interfacePath,
             allowReport: false,
           });
-          return Promise.reject(new Error('default fonts unknown'));
+          return Promise.reject(new util.ProcessCanceled('default fonts unknown'));
         })
         .catch(() => {
           context.api.showErrorNotification('"Skyrim - Interface.bsa" appears to be missing', err, {
             id: 'skyrim_interface_bsa_missing',
             allowReport: false,
           });
-          return Promise.reject(new Error('default fonts unknown'));
+          return Promise.reject(new util.ProcessCanceled('default fonts unknown'));
         });
     });
 
@@ -154,6 +154,7 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
       });
     })
     .catch(util.NotSupportedError, () => Promise.resolve(undefined))
+    .catch(util.ProcessCanceled, () => null)
     .catch((err: Error) => {
       return Promise.resolve({
         description: {
