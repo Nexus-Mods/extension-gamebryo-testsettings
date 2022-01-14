@@ -154,7 +154,7 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
       });
     })
     .catch(util.NotSupportedError, () => Promise.resolve(undefined))
-    .catch(util.ProcessCanceled, () => null)
+    .catch(util.ProcessCanceled, () => Promise.resolve(undefined))
     .catch((err: Error) => {
       return Promise.resolve({
         description: {
