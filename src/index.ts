@@ -105,7 +105,17 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
   const prom = defaultFonts[gameId] !== undefined
     ? Promise.resolve(undefined)
     : context.api.openArchive(interfacePath)
-    .then((archive: util.Archive) => archive.readDir('interface'))
+    .then((archive: util.Archive) => archive.readDir('interface')
+      .tap(() => {
+        // We don't need the archive open anymore. Usually we would just
+        //  leave it to the GC to release the file handle whenever V8 decides
+        //  to do it; but in this case the user might want to replace it entirely
+        //  with a mod (stupid I know) https://github.com/Nexus-Mods/Vortex/issues/11672
+        if (archive['mHandler']?.closeArchive !== undefined) {
+          archive['mHandler'].closeArchive();
+        }
+        archive = null;
+      }))
     .then((files: string[]) => {
       defaultFonts[gameId] = new Set<string>(files
         .filter(name => path.extname(name) === '.swf')
