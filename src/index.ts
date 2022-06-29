@@ -1,11 +1,12 @@
-import { iniPath, initGameSupport } from './util/gameSupport';
+import { gameSupportXboxPass, iniPath, initGameSupport, isXboxPath } from './util/gameSupport';
 import missingOblivionFont, { oblivionDefaultFonts } from './util/missingOblivionFonts';
 import missingSkyrimFonts from './util/missingSkyrimFonts';
+
 
 import Promise from 'bluebird';
 import * as path from 'path';
 import * as Redux from 'redux';
-import { fs, log, selectors, types, util } from 'vortex-api';
+import { actions, fs, log, selectors, types, util } from 'vortex-api';
 import IniParser, { IniFile, WinapiFormat } from 'vortex-parse-ini';
 
 const parser = new IniParser(new WinapiFormat());
@@ -176,14 +177,96 @@ function testSkyrimFontsImpl(context: types.IExtensionContext) {
     });
 }
 
+function testXboxMisonfiguredImpl(context: types.IExtensionContext) {
+  const t = context.api.translate;
+  const state = context.api.getState();
+  const gameId = selectors.activeGameId(state);
+  if (!Object.keys(gameSupportXboxPass).includes(gameId)) {
+    return Promise.resolve(undefined);
+  }
+  const gameDiscovery: types.IDiscoveryResult = util.getSafe(state,
+    ['settings', 'gameMode', 'discovered', gameId], undefined);
+  if (!gameDiscovery?.path
+   || !gameDiscovery.pathSetManually
+   || isXboxPath(gameDiscovery.path)) {
+    return Promise.resolve(undefined);
+  }
+
+  const manifestFile = path.join(gameDiscovery.path, 'appxmanifest.xml');
+  return fs.statAsync(manifestFile)
+    .then(() => {
+      const game = util.getGame(gameId);
+      const testResult: types.ITestResult = {
+        onRecheck: () => {
+          const newState = context.api.getState();
+          const gameDiscovery: types.IDiscoveryResult = util.getSafe(newState,
+            ['settings', 'gameMode', 'discovered', gameId], undefined);
+          if (!gameDiscovery?.path
+            || !gameDiscovery.pathSetManually
+            || isXboxPath(gameDiscovery.path)) {
+              return Promise.resolve();
+          } else {
+            return Promise.reject(new util.DataInvalid('Failed'));
+          }
+        },
+        description: {
+          short: 'Misconfigured game path',
+          long: t('The game directory of "{{gameName}}" appears to have an "appxmanifest.xml" file. '
+                + 'This file is usually distributed with Game Pass PC (XBox) variants of the game '
+                + 'yet on your system Vortex is configured to use incorrect file directories which '
+                + 'will make modding the game impossible.'
+                + '[br][/br][br][/br]Vortex can fix this for you by resetting your game\'s discovery '
+                + 'settings. This will only work if you do not have the game installed through other '
+                + 'game stores! (e.g. Steam)', { replace: { gameName: game.name } }),
+        },
+        automaticFix: () => {
+          const gamePath = game.queryPath();
+          const prom = (typeof(gamePath) === 'string')
+            ? Promise.resolve(gamePath)
+            : gamePath;
+          return prom.then((gamePath) => {
+            if (isXboxPath(gamePath)) {
+              // disco - disco - good - good
+              const disco: types.IDiscoveryResult = {
+                ...gameDiscovery,
+                path: gamePath,
+                pathSetManually: false,
+              };
+              context.api.store.dispatch(actions.addDiscoveredGame(gameId, disco));
+              context.api.sendNotification({
+                type: 'success',
+                message: t('Game discovery settings have been corrected'),
+                displayMS: 3000,
+              })
+            } else {
+              context.api.showErrorNotification('Failed to apply fix',
+                t('The game path resolved by the game extension does not appear to be '
+                + 'a Game Pass PC (XBox) directory - please make sure the game is installed '
+                + 'correctly through the Game Pass store, and no other game store!'), { allowReport: false });
+            }
+          })
+          .catch(err => {
+            context.api.showErrorNotification('Failed to apply fix', err, { allowReport: false });
+          })
+        },
+        severity: 'warning' as types.ProblemSeverity,
+      }
+      return Promise.resolve(testResult);
+    })
+    .catch(err => Promise.resolve(undefined));
+}
+
 function init(context: types.IExtensionContext): boolean {
   const testOblivionFonts = (): Promise<types.ITestResult> =>
     testOblivionFontsImpl(context.api);
 
   const testSkyrimFonts = (): Promise<types.ITestResult> => testSkyrimFontsImpl(context);
 
+  const testXboxMisonfigured = (): Promise<types.ITestResult> => testXboxMisonfiguredImpl(context);
+
   context.registerTest('oblivion-fonts', 'gamemode-activated', testOblivionFonts as any);
   context.registerTest('skyrim-fonts', 'gamemode-activated', testSkyrimFonts as any);
+  context.registerTest('xbox-incorrectly-set', 'gamemode-activated', testXboxMisonfigured as any);
 
   context.once(() => {
     context.api.onStateChange(

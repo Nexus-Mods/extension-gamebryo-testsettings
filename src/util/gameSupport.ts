@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as Redux from 'redux';
-import { types, util } from 'vortex-api';
+import { fs, types, util } from 'vortex-api';
 
-const gameSupportXboxPass = {
+export const gameSupportXboxPass = {
   skyrimse: {
     mygamesPath: 'Skyrim Special Edition MS',
   },
@@ -54,7 +54,7 @@ const gameSupport = {
   },
 };
 
-function isXboxPath(discoveryPath: string) {
+export function isXboxPath(discoveryPath: string) {
   const hasPathElement = (element) =>
     discoveryPath.toLowerCase().includes(element);
   return ['modifiablewindowsapps', '3275kfvn8vcwc'].find(hasPathElement) !== undefined;
