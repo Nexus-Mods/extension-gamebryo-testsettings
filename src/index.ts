@@ -235,8 +235,9 @@ function testXboxMisonfiguredImpl(context: types.IExtensionContext) {
               context.api.store.dispatch(actions.addDiscoveredGame(gameId, disco));
               context.api.sendNotification({
                 type: 'success',
-                message: t('Game discovery settings have been corrected'),
-                displayMS: 3000,
+                message: t('Game settings have been updated, please restart Vortex.'),
+                noDismiss: true,
+                allowSuppress: false,
               })
             } else {
               context.api.showErrorNotification('Failed to apply fix',
