@@ -270,6 +270,7 @@ function init(context: types.IExtensionContext): boolean {
   context.registerTest('xbox-incorrectly-set', 'gamemode-activated', testXboxMisonfigured as any);
 
   context.once(() => {
+    initGameSupport(context.api.store);
     context.api.onStateChange(
       ['settings', 'gameMode', 'discovered'], (previous, current) => {
         initGameSupport(context.api.store);
