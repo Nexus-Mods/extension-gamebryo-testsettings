@@ -2,6 +2,11 @@ import * as path from 'path';
 import * as Redux from 'redux';
 import { selectors, types, util } from 'vortex-api';
 
+interface IGameSupport {
+  mygamesPath: string;
+  iniName: string;
+}
+
 export const gameSupportXboxPass = {
   skyrimse: {
     mygamesPath: 'Skyrim Special Edition MS',
@@ -9,15 +14,9 @@ export const gameSupportXboxPass = {
   fallout4: {
     mygamesPath: 'Fallout4 MS',
   },
-}
-
-const gameSupportGOG = {
-  skyrimse: {
-    mygamesPath: 'Skyrim Special Edition GOG',
-  },
 };
 
-const gameSupport = {
+const gameSupport = util.makeOverlayableDictionary<string, IGameSupport>({
   skyrim: {
     mygamesPath: 'skyrim',
     iniName: 'Skyrim.ini',
@@ -58,13 +57,14 @@ const gameSupport = {
     mygamesPath: 'Oblivion',
     iniName: 'Oblivion.ini',
   },
-};
-
-export function isXboxPath(discoveryPath: string) {
-  const hasPathElement = (element) =>
-    discoveryPath.toLowerCase().includes(element);
-  return ['modifiablewindowsapps', '3275kfvn8vcwc'].find(hasPathElement) !== undefined;
-}
+}, {
+  xbox: gameSupportXboxPass,
+  gog: {
+    skyrimse: {
+      mygamesPath: 'Skyrim Special Edition GOG',
+    },
+  },
+}, (gameId: string) => gameStoreForGame(gameId));
 
 let gameStoreForGame: (gameId: string) => string = () => undefined;
 
@@ -75,14 +75,6 @@ export function initGameSupport(store: Redux.Store<types.IState>) {
 
   const {discovered} = state.settings.gameMode;
 
-  Object.keys(gameSupportXboxPass).forEach(gameMode => {
-    if (discovered[gameMode]?.path !== undefined) {
-      if (isXboxPath(discovered[gameMode].path)) {
-        gameSupport[gameMode].mygamesPath = gameSupportXboxPass[gameMode].mygamesPath;
-      }
-    }
-  })
-
   if (discovered['enderalspecialedition']?.path !== undefined) {
     if (discovered['enderalspecialedition']?.path.toLowerCase().includes('skyrim')) {
       gameSupport['enderalspecialedition'] = JSON.parse(JSON.stringify(gameSupport['skyrimse']));
@@ -91,18 +83,13 @@ export function initGameSupport(store: Redux.Store<types.IState>) {
 }
 
 export function gameSupported(gameMode: string): boolean {
-  return gameSupport[gameMode] !== undefined;
+  return gameSupport.has(gameMode);
 }
 
 export function mygamesPath(gameMode: string): string {
-  const relPath = (gameStoreForGame(gameMode) === 'gog') && !!gameSupportGOG[gameMode]
-    ? gameSupportGOG[gameMode].mygamesPath
-    : gameSupport[gameMode].mygamesPath;
-
-  return path.join(util.getVortexPath('documents'), 'My Games', relPath);
+  return path.join(util.getVortexPath('documents'), 'My Games', gameSupport.get(gameMode, 'mygamesPath'));
 }
 
 export function iniPath(gameMode: string): string {
-  const { iniName } = gameSupport[gameMode];
-  return path.join(mygamesPath(gameMode), iniName);
+  return path.join(mygamesPath(gameMode), gameSupport.get(gameMode, 'iniName'));
 }

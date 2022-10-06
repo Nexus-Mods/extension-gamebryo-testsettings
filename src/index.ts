@@ -1,4 +1,4 @@
-import { gameSupportXboxPass, iniPath, initGameSupport, isXboxPath } from './util/gameSupport';
+import { gameSupportXboxPass, iniPath, initGameSupport } from './util/gameSupport';
 import missingOblivionFont, { oblivionDefaultFonts } from './util/missingOblivionFonts';
 import missingSkyrimFonts from './util/missingSkyrimFonts';
 
@@ -10,6 +10,12 @@ import { actions, fs, log, selectors, types, util } from 'vortex-api';
 import IniParser, { IniFile, WinapiFormat } from 'vortex-parse-ini';
 
 const parser = new IniParser(new WinapiFormat());
+
+function isXboxPath(discoveryPath: string) {
+  const hasPathElement = (element) =>
+    discoveryPath.toLowerCase().includes(element);
+  return ['modifiablewindowsapps', '3275kfvn8vcwc'].find(hasPathElement) !== undefined;
+}
 
 function fixOblivionFonts(iniFile: IniFile<any>, missingFonts: string[], gameId: string): Promise<void> {
   return new Promise<void>((fixResolve, fixReject) => {
@@ -225,6 +231,10 @@ function testXboxMisonfiguredImpl(context: types.IExtensionContext) {
             ? Promise.resolve(gamePath)
             : gamePath;
           return prom.then((gamePath) => {
+            if (typeof(gamePath) !== 'string') {
+              gamePath = gamePath.gamePath;
+            }
+
             if (isXboxPath(gamePath)) {
               // disco - disco - good - good
               const disco: types.IDiscoveryResult = {
