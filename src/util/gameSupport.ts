@@ -64,22 +64,28 @@ const gameSupport = util.makeOverlayableDictionary<string, IGameSupport>({
       mygamesPath: 'Skyrim Special Edition GOG',
     },
   },
-}, (gameId: string) => gameStoreForGame(gameId));
-
-let gameStoreForGame: (gameId: string) => string = () => undefined;
-
-export function initGameSupport(store: Redux.Store<types.IState>) {
-  const state: types.IState = store.getState();
-
-  gameStoreForGame = (gameId: string) => selectors.discoveryByGame(store.getState(), gameId)['store'];
-
-  const {discovered} = state.settings.gameMode;
-
-  if (discovered['enderalspecialedition']?.path !== undefined) {
-    if (discovered['enderalspecialedition']?.path.toLowerCase().includes('skyrim')) {
-      gameSupport['enderalspecialedition'] = JSON.parse(JSON.stringify(gameSupport['skyrimse']));
-    }
+  enderalseOverlay: {
+    enderalspecialedition: {
+      mygamesPath: 'Skyrim Special Edition',
+      iniName: 'Skyrim.ini',
+    },
   }
+}, (gameId: string) => {
+  const discovery = discoveryForGame(gameId);
+  if ((discovery.path !== undefined)
+      && (gameId === 'enderalspecialedition')
+      && discovery.path.includes('skyrim')) {
+    return 'enderalseOverlay';
+  }
+  else {
+    return discovery.store;
+  }
+});
+
+let discoveryForGame: (gameId: string) => types.IDiscoveryResult = () => undefined;
+
+export function initGameSupport(api: types.IExtensionApi) {
+  discoveryForGame = (gameId: string) => selectors.discoveryByGame(api.store.getState(), gameId);
 }
 
 export function gameSupported(gameMode: string): boolean {

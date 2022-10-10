@@ -268,6 +268,7 @@ function testXboxMisonfiguredImpl(context: types.IExtensionContext) {
 }
 
 function init(context: types.IExtensionContext): boolean {
+  initGameSupport(context.api);
   const testOblivionFonts = (): Promise<types.ITestResult> =>
     testOblivionFontsImpl(context.api);
 
@@ -278,14 +279,6 @@ function init(context: types.IExtensionContext): boolean {
   context.registerTest('oblivion-fonts', 'gamemode-activated', testOblivionFonts as any);
   context.registerTest('skyrim-fonts', 'gamemode-activated', testSkyrimFonts as any);
   context.registerTest('xbox-incorrectly-set', 'gamemode-activated', testXboxMisonfigured as any);
-
-  context.once(() => {
-    initGameSupport(context.api.store);
-    context.api.onStateChange(
-      ['settings', 'gameMode', 'discovered'], (previous, current) => {
-        initGameSupport(context.api.store);
-      });
-  });
 
   return true;
 }
