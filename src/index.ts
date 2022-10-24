@@ -241,6 +241,7 @@ function testXboxMisonfiguredImpl(context: types.IExtensionContext) {
                 ...gameDiscovery,
                 path: gamePath,
                 pathSetManually: false,
+                store: 'xbox',
               };
               context.api.store.dispatch(actions.addDiscoveredGame(gameId, disco));
               context.api.sendNotification({
