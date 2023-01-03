@@ -186,7 +186,6 @@ function init(context: types.IExtensionContext): boolean {
 
   context.registerTest('oblivion-fonts', 'gamemode-activated', testOblivionFonts as any);
   context.registerTest('skyrim-fonts', 'gamemode-activated', testSkyrimFonts as any);
-  context.registerTest('xbox-incorrectly-set', 'gamemode-activated', testXboxMisonfigured as any);
 
   return true;
 }
