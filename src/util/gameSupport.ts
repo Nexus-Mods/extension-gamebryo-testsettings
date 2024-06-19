@@ -53,6 +53,10 @@ const gameSupport = util.makeOverlayableDictionary<string, IGameSupport>({
     mygamesPath: 'FalloutNV',
     iniName: 'Fallout.ini',
   },
+  starfield: {
+    mygamesPath: 'Starfield',
+    iniName: 'StarfieldCustom.ini',
+  },
   oblivion: {
     mygamesPath: 'Oblivion',
     iniName: 'Oblivion.ini',
